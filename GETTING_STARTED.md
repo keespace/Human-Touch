@@ -37,4 +37,4 @@ Your browser then opens at **http://localhost:8765**. Keep the black or Terminal
 - Text is only sent to Anthropic for analysis. Nothing is stored.
 - **If Windows shows "Windows protected your PC"** when you double-click the start file, click **More info → Run anyway**. This appears for any script downloaded from someone else. Only do it if you trust the person who sent you the app.
 - **If you see "address already in use"**, the app is already running. Open http://localhost:8765 in your browser.
-- **Results are evidence, not proof.** Please never use them alone to accuse anyone.
+- **Results describe patterns in the text, not facts about a person.** Never use them as the only basis for a decision about anyone, or to make public claims about someone's work.

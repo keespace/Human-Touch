@@ -2,7 +2,9 @@
 
 ### What are our children reading?
 
-More and more of the stories, books and articles our kids read are written by machines. **Human Touch helps parents, teachers and readers see whether a real person, with real emotions, empathy and judgement, wrote the words in front of them.** It also checks whether those words were copied from somewhere else.
+More and more of the stories, books and articles our kids read are written by machines. **Human Touch helps parents, teachers and readers look closer at the words in front of them.** It shows the writing patterns that point to a real person, with real emotions, empathy and judgement, or to a machine, and where matching wording appears online.
+
+> Human Touch describes patterns in a text. It does not determine who wrote it or how, and it makes no claims about any person. Results are signals for a human to review, never conclusions.
 
 ![Human Touch home page](docs/screenshots/home.png)
 
@@ -13,13 +15,15 @@ More and more of the stories, books and articles our kids read are written by ma
 
   | Verdict | What it means |
   |---|---|
-  | 🟢 **Human-written** | A person wrote it without AI help. |
-  | 🟡 **AI-assisted** | A person's own draft, polished or expanded by AI: human substance, machine-smooth surface. |
-  | 🟠 **AI-written, human-edited** | An AI draft that a person revised: machine skeleton, human patches. |
-  | 🔴 **AI-generated** | AI output used as-is. |
+  | 🟢 **Reads as human-written** | The text shows the patterns typical of human writing. |
+  | 🟡 **Signs of AI-assisted editing** | Specific, personal substance with an unusually smooth, polished surface. |
+  | 🟠 **Signs of an edited AI draft** | A template-like structure with personal touches layered on. |
+  | 🔴 **Strong AI-like patterns** | Generic content and surface typical of unedited AI output. |
+
+  Many people use AI tools legitimately, for spelling, translation or editing, so AI-like patterns are not evidence of wrongdoing.
 
 - **Shows its evidence.** Every verdict explains why, and every web source is a link you can open and read yourself.
-- **Honest by design.** When the evidence is close, it says "too close to call" instead of guessing. A false accusation is worse than an honest "uncertain".
+- **Honest by design.** It describes the text, never the person. When the signals are close, it says "inconclusive" instead of guessing.
 - **An assistant you can ask.** It answers questions about the result, such as "Is this from a published book?" or "Which paragraph looks most AI-written?", and runs refined web searches with cited sources.
 
 ![Example result: a children's story analysed by Human Touch](docs/screenshots/results.png)
@@ -52,13 +56,13 @@ To try it instantly with an example, open http://localhost:8765/?example=kids. Y
 |---|---|---|---|
 | **Quick pattern check** | Measures sentence rhythm, stock AI vocabulary, personal voice, concrete detail, formulaic structure and tidy endings | In your browser | Free |
 | **Detailed analysis** | Claude reads the text paragraph by paragraph, with objective measurements as evidence, and gives probabilities for the four categories | Anthropic API | ~$0.03–0.08 per check |
-| **Find copies online** | Planned exact-phrase web searches, verified overlap, and every source listed as a clickable link | Anthropic API + web search | ~$0.05–0.15 per search |
+| **Find matching text online** | Planned exact-phrase web searches, verified overlap, and every source listed as a clickable link. Matching text can have innocent explanations, such as quotation, licensing or reuse by others. | Anthropic API + web search | ~$0.05–0.15 per search |
 | **Assistant** | Answers questions about the result and runs refined searches with citations | Anthropic API + web search | ~$0.02–0.10 per question |
 
 **How the verdict is decided:** the human share is compared with all AI shares combined.
-- 60% or more human: the verdict is **human-written**.
-- 40% or less human: the verdict is the most likely kind of AI involvement.
-- Anything in between: **too close to call**, with the direction it leans.
+- 60% or more human: the result is **reads as human-written**.
+- 40% or less human: the result is the strongest of the three AI-like patterns.
+- Anything in between: **inconclusive**, with the direction it leans.
 
 The quick pattern check is shown alongside the main verdict, but it's easy to fool. For example, AI that imitates a personal voice can pass it. The detailed analysis is the better guide.
 
@@ -90,7 +94,7 @@ make_share_zip.py     builds a shareable zip without your API key
 
 ## Important
 
-**Results are evidence, not proof.** No AI detector is reliable enough to accuse anyone. Formal, simple or non-native writing can look AI-like. Please never use this tool's result alone to accuse, grade or discipline a person.
+**Results describe patterns, not people.** No tool can determine for certain how a text was produced, and formal, simple or non-native writing can show AI-like patterns. Never use a result as the sole basis for any decision about a person, such as grading, discipline, hiring or publishing decisions. Never use it to make public claims about a person or their work.
 
 Human Touch uses Claude by Anthropic. It is an independent project and is not affiliated with or endorsed by Anthropic.
 

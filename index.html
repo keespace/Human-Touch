@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Human Touch — What are our children reading?</title>
-<meta name="description" content="Find out whether a story, book page or article was written by a real person or by AI — and where its words came from.">
+<meta name="description" content="Look closer at a story, book page or article: see the writing patterns that point to human or AI-like writing, and where matching text appears online.">
 <style>
   :root {
     --bg: #fbf7f1; --card: rgba(255,255,255,.86); --solid: #ffffff; --ink: #1c1a33; --muted: #6c6985; --line: #ebe4da;
@@ -80,6 +80,7 @@
   .pill.mixed { background: var(--mixed-bg); color: var(--mixed); }
   .pill.ai { background: var(--ai-bg); color: var(--ai); }
   .confidence { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+  .disclaimer { margin-top: 12px; padding: 9px 12px; border-radius: 10px; background: #f6f2ea; color: #5c5872; font-size: .82rem; line-height: 1.5; }
   .breakdown { display: flex; height: 14px; border-radius: 999px; overflow: hidden; margin-top: 16px; background: #eee; }
   .breakdown span { display: block; height: 100%; transition: width .6s; }
   .breakdown-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: .84rem; color: #4a4763; }
@@ -219,7 +220,7 @@
 <header class="hero">
   <span class="eyebrow"><span class="dot"></span>For parents, teachers &amp; everyone who reads</span>
   <h1>What are our children <span class="grad">reading?</span></h1>
-  <p class="lede">More and more of the stories, books and articles our kids read are written by machines. <strong>Human Touch helps you see whether a real person — with real emotions, empathy and judgement — wrote the words in front of you.</strong></p>
+  <p class="lede">More and more of the stories, books and articles our kids read are written by machines. <strong>Human Touch helps you look closer at the words in front of you — showing the writing patterns that point to a real person, with real emotions, empathy and judgement, or to a machine.</strong></p>
   <div class="hero-cta">
     <button class="primary big" onclick="document.getElementById('check').scrollIntoView();document.getElementById('input').focus({preventScroll:true})">Check a text now</button>
     <button class="big ghost" onclick="document.getElementById('mission').scrollIntoView()">Why it matters →</button>
@@ -228,9 +229,9 @@
 
 <section class="values">
   <div class="value"><div class="ico">🧒</div><h3>Made for what kids read</h3><p>Picture books, school reading, stories and articles — checked with care, because simple writing isn't a sign of AI.</p></div>
-  <div class="value"><div class="ico">⚖️</div><h3>Human, AI — or in between</h3><p>Not just a score: human-written, AI-assisted, AI-written then edited, or AI-generated, paragraph by paragraph.</p></div>
+  <div class="value"><div class="ico">⚖️</div><h3>Signals, not verdicts</h3><p>Not a single score: it shows which patterns the text has — human-like, AI-assisted editing, edited AI draft, or strongly AI-like — paragraph by paragraph.</p></div>
   <div class="value"><div class="ico">🔍</div><h3>Shows its evidence</h3><p>Every verdict explains why, and every web source is a link you can open and read yourself.</p></div>
-  <div class="value"><div class="ico">🤝</div><h3>Honest by design</h3><p>When it's too close to call, we say so. A false accusation is worse than an honest "uncertain".</p></div>
+  <div class="value"><div class="ico">🤝</div><h3>Honest by design</h3><p>It describes the text, never the person. When the signals are close, it says "inconclusive" instead of guessing.</p></div>
 </section>
 
 <main>
@@ -266,6 +267,7 @@
           </div>
           <div class="confidence" id="confidence"></div>
           <div class="confidence" id="quickNote"></div>
+          <div class="disclaimer">This describes patterns in the text only. It is not a finding that anyone used AI or copied anything, and it must not be the only basis for any decision about a person.</div>
         </div>
       </div>
       <div class="deep" id="deepBox">
@@ -285,7 +287,7 @@
       <div class="tabs">
         <button class="tab active" data-tab="signals">Signals</button>
         <button class="tab" data-tab="text">Highlighted text</button>
-        <button class="tab" data-tab="plag">Find copies online</button>
+        <button class="tab" data-tab="plag">Find matching text online</button>
       </div>
 
       <div data-panel="signals">
@@ -323,7 +325,7 @@
         <div class="signal-name" style="margin-bottom:8px">Or check by hand</div>
         <div class="note" style="margin-bottom:14px">
           These are the most <strong>distinctive</strong> sentences in your text — the ones least likely to appear anywhere else by chance.
-          Each link runs an exact-quote search. If a search finds the same sentence word-for-word on another site or in a book, that's a strong sign it was copied (or that the other site copied it).
+          Each link runs an exact-quote search. If the same sentence appears word-for-word elsewhere, that is worth a closer look — but matching text has many innocent explanations: a quotation, licensed or syndicated content, the same author's other work, or another site reusing this text.
         </div>
         <div id="plagList"></div>
       </div>
@@ -333,9 +335,9 @@
   <section class="card" id="how">
     <h2>How to read the results</h2>
     <div class="why">
-      <p><strong>This is evidence, not proof.</strong> No tool — including expensive commercial detectors — can tell for certain whether text was written by AI. Treat the result as a reason to look closer, never as a final judgement about a person.</p>
-      <p><strong>False alarms happen.</strong> Formal, polished, or very simple writing can look "AI-like". So can writing by people who learned English as a second language, and simple children's prose. Please never accuse someone based on this result alone.</p>
-      <p><strong>Four kinds of authorship.</strong> <em>Human-written</em>: no AI involved. <em>AI-assisted</em>: a person's own ideas and draft, polished or expanded by AI — human substance, machine-smooth surface. <em>AI-written, human-edited</em>: an AI draft that a person revised — machine skeleton, human patches. <em>AI-generated</em>: AI output used as-is. The middle two are the hardest to tell apart, so read the percentages, not just the label.</p>
+      <p><strong>Patterns, not conclusions.</strong> Human Touch describes patterns in a text. It does not determine who wrote it or how, and no tool — including expensive commercial ones — can. A result is a reason to look closer and ask questions, never a finding about a person.</p>
+      <p><strong>Human writing can look AI-like.</strong> Formal, polished or very simple writing can show AI-like patterns. So can writing by people who learned English as a second language, and simple children's prose. Never use a result on its own to make a decision about anyone, and never make public claims about a person or their work based on it.</p>
+      <p><strong>Four kinds of patterns.</strong> <em>Reads as human-written</em>: the patterns typical of human writing. <em>Signs of AI-assisted editing</em>: specific, personal substance with an unusually smooth, polished surface. <em>Signs of an edited AI draft</em>: a template-like structure with personal touches layered on. <em>Strong AI-like patterns</em>: generic content and surface typical of unedited AI output. The middle two are the hardest to tell apart, so read the percentages, not just the label. Many people use AI tools legitimately — for spelling, translation or editing — so AI-like patterns are not evidence of wrongdoing.</p>
       <p><strong>Human writing has fingerprints:</strong> uneven rhythm, specific memories, names, places and numbers, opinions, small imperfections, and a voice that takes a side. AI writing tends to be smooth, balanced, general, and evenly paced.</p>
     </div>
   </section>
@@ -344,7 +346,7 @@
 <section class="mission" id="mission">
   <div class="mission-card">
     <h2>The stories our children read shape who they become.</h2>
-    <p>Children learn empathy, courage and what it means to be human from the books in their hands. As AI writes more of what we read, families deserve to know when there's a real person — with real feelings, judgement and a point of view — behind the words.</p>
+    <p>Children learn empathy, courage and what it means to be human from the books in their hands. As AI writes more of what we read, families deserve tools to look closer — and to recognise the signs of a real person, with real feelings, judgement and a point of view, behind the words.</p>
     <p>Human Touch doesn't oppose AI. It makes authorship visible, so parents, teachers and readers can choose with their eyes open.</p>
     <div class="mission-points">
       <div><strong>For parents</strong>Check the picture books, stories and apps your children read.</div>
@@ -354,7 +356,7 @@
   </div>
 </section>
 
-<footer>The quick pattern score runs entirely in your browser. When you check a text, search the web or ask the assistant, the text is sent to Anthropic's API for analysis. Nothing is stored. Results are evidence, not proof.</footer>
+<footer>Human Touch describes writing patterns; it does not determine authorship and makes no claims about any person. Results must not be the sole basis for any decision about anyone. The quick pattern score runs entirely in your browser; when you check a text, search the web or ask the assistant, the text is sent to Anthropic's API for analysis. Nothing is stored.</footer>
 
 <div id="popover" class="hidden"></div>
 
@@ -539,7 +541,7 @@ function analyze(text) {
   return { score, signals, aiFound, humanFound, sents: sentInfo, nWords };
 }
 
-// ---------- Plagiarism candidates ----------
+// ---------- Matching-text search: candidate sentences ----------
 function distinctiveSentences(sents, k = 6) {
   return sents
     .map(s => {
@@ -580,11 +582,11 @@ function render(r, text) {
   $("gauge").style.background = `conic-gradient(${color} ${r.score * 3.6}deg, #eee 0)`;
   const pill = $("verdictPill");
   pill.className = "pill " + band;
-  pill.textContent = { human: "Likely written by a human", mixed: "Mixed — possibly AI-assisted", ai: "Likely AI-generated" }[band];
+  pill.textContent = { human: "Mostly human-like patterns", mixed: "Mixed patterns", ai: "Mostly AI-like patterns" }[band];
   $("verdictText").textContent = {
     human: "This text shows the uneven rhythm, personal voice and concrete detail that people tend to leave behind.",
     mixed: "Some patterns point to a person, others to an AI. That fits AI-assisted writing, an AI draft edited by a person — or simply a very formal human style.",
-    ai: "This text has many hallmarks of AI writing: steady rhythm, stock phrases, tidy structure and few personal or specific details."
+    ai: "This text shows many patterns common in AI-generated writing: steady rhythm, stock phrases, tidy structure and few personal or specific details. Some human writing shares these patterns too."
   }[band];
   $("confidence").textContent = r.nWords < 80
     ? `⚠ Only ${r.nWords} words — too short for a reliable reading. Paste at least 80, ideally 250+.`
@@ -632,7 +634,7 @@ function render(r, text) {
     el.addEventListener("click", () => window.open(searchLinks(s.text.trim())[0][1], "_blank", "noopener"));
   });
 
-  // Plagiarism
+  // Matching-text search
   const cands = distinctiveSentences(r.sents);
   current = { text, score: r.score, words: r.nWords, sentences: cands.map(c => c.clean) };
   deepRun++;  // ignore any analysis still running for the previous text
@@ -682,11 +684,12 @@ async function callApi(path, body) {
 const list = items => items && items.length ? `<ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="count">None noted</p>`;
 
 const CAT = {
-  human_written:           { label: "Human-written",            band: "human", desc: "A person wrote this without AI help." },
-  ai_assisted:             { label: "AI-assisted",              band: "mixed", desc: "A person wrote it; an AI polished, corrected or expanded it." },
-  ai_written_human_edited: { label: "AI-written, human-edited", band: "mixed", desc: "An AI drafted it; a person then revised it." },
-  ai_generated:            { label: "AI-generated",             band: "ai",    desc: "An AI wrote it and it was used largely as-is." },
-  uncertain:               { label: "Uncertain",                band: "mixed", desc: "The evidence doesn't clearly favour any one category." },
+  // Labels describe the TEXT's patterns, never what a person did.
+  human_written:           { label: "Reads as human-written",       band: "human", desc: "The text shows the patterns typical of human writing." },
+  ai_assisted:             { label: "Signs of AI-assisted editing", band: "mixed", desc: "Specific, personal substance with an unusually smooth, polished surface." },
+  ai_written_human_edited: { label: "Signs of an edited AI draft",  band: "mixed", desc: "A template-like structure with personal touches layered on." },
+  ai_generated:            { label: "Strong AI-like patterns",      band: "ai",    desc: "Generic content and surface typical of unedited AI output." },
+  uncertain:               { label: "Inconclusive",                 band: "mixed", desc: "The patterns don't clearly favour any one category." },
 };
 const ORDER = ["human_written", "ai_assisted", "ai_written_human_edited", "ai_generated"];
 const domainOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
@@ -714,13 +717,13 @@ async function runDeep() {
     // Main verdict now comes from Claude
     $("verdictSource").textContent = "— from Claude's analysis";
     $("verdictPill").className = "pill " + cat.band;
-    $("verdictPill").textContent = d.verdict === "uncertain" ? `Too close to call — leans ${CAT[d.leans].label}` : cat.label;
+    $("verdictPill").textContent = d.verdict === "uncertain" ? `Inconclusive — leans towards: ${CAT[d.leans].label.toLowerCase()}` : cat.label;
     $("verdictText").textContent = d.summary;
     const color = { human: "var(--human)", mixed: "var(--mixed)", ai: "var(--ai)" }[d.ai_involvement < 35 ? "human" : d.ai_involvement < 62 ? "mixed" : "ai"];
     $("score").textContent = d.ai_involvement;
     $("score").style.color = color;
     $("gauge").style.background = `conic-gradient(${color} ${d.ai_involvement * 3.6}deg, #eee 0)`;
-    $("gaugeLbl").textContent = "AI involvement";
+    $("gaugeLbl").textContent = "AI-pattern score";
     $("breakdown").innerHTML = ORDER.map(c => `<span class="c-${c}" style="width:${d.probabilities[c]}%" title="${CAT[c].label}: ${d.probabilities[c]}%"></span>`).join("");
     $("breakdownLegend").innerHTML = ORDER.map(c => `<span><b class="c-${c}"></b>${CAT[c].label} <strong>${d.probabilities[c]}%</strong></span>`).join("");
     $("breakdownWrap").classList.remove("hidden");
@@ -740,11 +743,11 @@ async function runDeep() {
     out.innerHTML = `<div class="deep-card">
       ${d.recognized_source ? `<p style="margin:0 0 10px"><strong>Recognised as a published work:</strong> ${esc(d.recognized_source)}</p>` : ""}
       <div class="deep-cols" style="margin-top:0">
-        <div><div class="signal-name" style="color:var(--human)">Evidence of a human author</div>${list(d.evidence_for_human)}</div>
-        <div><div class="signal-name" style="color:var(--ai)">Evidence of AI involvement</div>${list(d.evidence_for_ai)}</div>
+        <div><div class="signal-name" style="color:var(--human)">Patterns typical of human writing</div>${list(d.evidence_for_human)}</div>
+        <div><div class="signal-name" style="color:var(--ai)">Patterns typical of AI writing</div>${list(d.evidence_for_ai)}</div>
       </div>
       ${paras ? `<div style="margin-top:16px"><div class="signal-name">Paragraph by paragraph</div>
-        <p class="count" style="margin:2px 0 6px">${mixedParas ? "Paragraphs read differently from each other — a common sign of mixed human/AI authorship." : "All paragraphs read consistently."}</p>${paras}</div>` : ""}
+        <p class="count" style="margin:2px 0 6px">${mixedParas ? "Paragraphs show different patterns from each other. This can happen when a text has been edited in stages, written by several people, or combined from different sources." : "All paragraphs read consistently."}</p>${paras}</div>` : ""}
       ${d.notable_passages && d.notable_passages.length ? `<div style="margin-top:14px"><div class="signal-name">Telling passages</div>
         ${d.notable_passages.map(p => `<div class="match" style="border-left-color:${p.leans === "ai" ? "var(--ai)" : "var(--human)"}">
           <span class="quote">“${esc(p.quote)}”</span><div class="count">${p.leans === "ai" ? "Leans AI" : "Leans human"} — ${esc(p.why)}</div></div>`).join("")}</div>` : ""}
@@ -771,24 +774,25 @@ async function runPlag() {
   btn.disabled = true;
   out.innerHTML = `<p class="count"><span class="spinner"></span>Searching the web and checking the pages it finds… (usually 30–90 seconds)</p>`;
   try {
-    const d = await callApi("/api/plagiarism", { text: current.text, sentences: current.sentences });
+    const d = await callApi("/api/matching-text",{ text: current.text, sentences: current.sentences });
     lastPlag = d;
-    const band = { no_matches_found: "human", possible_matches: "mixed", likely_copied: "ai" }[d.verdict] || "mixed";
-    const label = { no_matches_found: "No copies found", possible_matches: "Possible matches", likely_copied: "Likely copied" }[d.verdict] || d.verdict;
+    const band = { no_matches_found: "human", possible_matches: "mixed", likely_copied: "mixed" }[d.verdict] || "mixed";
+    const label = { no_matches_found: "No matching text found", possible_matches: "Similar text found", likely_copied: "Matching text found online" }[d.verdict] || "Search complete";
     const matched = new Set(d.matches.map(m => m.url));
     const searches = (d.searches || []).filter(s => s.results.length);
     out.innerHTML = `<div class="deep-card">
       <div class="row" style="margin:0"><span class="pill ${band}">${label}</span>
         <span class="count">${(d.searches || []).length} searches · ${d.pages_checked} pages found</span></div>
       <p style="margin:12px 0 0">${esc(d.summary || "")}</p>
-      ${d.matches.length ? `<div class="signal-name" style="margin-top:14px">References with matching wording</div>` : ""}
+      ${d.matches.length ? `<div class="signal-name" style="margin-top:14px">Pages with matching wording</div>
+        <p class="count" style="margin:2px 0 0">Matching text is not evidence of copying. It may be a quotation, licensed or syndicated content, the same author's other work — or another site reusing this text. Check the dates and context before drawing any conclusion.</p>` : ""}
       ${d.matches.map(m => `<div class="match">
         <a href="${safeUrl(m.url)}" target="_blank" rel="noopener">${esc(m.title || m.url)} ↗</a> <span class="domain">${esc(domainOf(m.url))}</span>
         <div class="count">${esc((m.match_type || "").replace("_", " "))} match — ${esc(m.note || "")}</div>
         ${m.matched_text ? `<div style="margin-top:6px;font-size:.88rem"><span class="count">Your text:</span> <span class="quote">“${esc(m.matched_text)}”</span></div>` : ""}
         ${m.evidence ? `<div style="font-size:.88rem"><span class="count">On that page:</span> <span class="quote">“${esc(m.evidence)}”</span></div>` : ""}
       </div>`).join("")}
-      ${d.verdict === "no_matches_found" ? `<p class="count" style="margin:10px 0 0">Not finding a copy doesn't prove originality — print books, paywalled sites and very recent pages often aren't searchable.</p>` : ""}
+      ${d.verdict === "no_matches_found" ? `<p class="count" style="margin:10px 0 0">Search coverage is limited — print books, paywalled sites and very recent pages often aren't searchable.</p>` : ""}
       ${searches.length ? `<details ${d.matches.length ? "" : "open"}><summary>Every source the search found (${d.pages_checked}) — open any to read it yourself</summary>
         ${searches.map(s => `<div style="margin-top:10px"><div class="count">Search: <strong>${esc(s.query)}</strong></div>
           <ul class="src-list">${s.results.map(r => `<li><a href="${safeUrl(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>
@@ -832,10 +836,10 @@ function addMsg(role, html) {
 
 function chatSuggestions() {
   let list;
-  if (!current) list = ["What are the signs a children's book was written by AI?", "Can AI detectors be wrong?", "How does Human Touch decide?"];
+  if (!current) list = ["Which writing patterns are typical of AI-generated stories?", "Why can human writing look AI-like?", "How does Human Touch work?"];
   else {
     list = ["Is this from a published book?", "Which paragraph looks most AI-written, and why?"];
-    list.push(lastPlag ? (lastPlag.matches.length ? "Which source is most likely the original?" : "Search children's book and publisher sites for this")
+    list.push(lastPlag ? (lastPlag.matches.length ? "What could explain these matches?" : "Search children's book and publisher sites for this")
                        : "Search Google Books for the opening line");
     list.push("How could the author show they wrote this?");
   }
