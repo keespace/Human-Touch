@@ -31,11 +31,11 @@ You need **Python 3.10+** ([download](https://www.python.org/downloads/)). On Wi
 You also need **your own Anthropic API key** ([get one](https://platform.claude.com)). Without a key, only the free quick check works.
 
 ```bash
-git clone https://github.com/keespace/human-touch.git
+git clone https://github.com/keespace/Human-Touch.git
 ```
 
 ```bash
-cd human-touch
+cd Human-Touch
 ```
 
 Then start it:
