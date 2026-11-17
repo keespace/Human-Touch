@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human Touch — What are our children reading?</title>
+<meta name="description" content="Find out whether a story, book page or article was written by a real person or by AI — and where its words came from.">
+<style>
+  :root {
+    --bg: #fbf7f1; --card: rgba(255,255,255,.86); --solid: #ffffff; --ink: #1c1a33; --muted: #6c6985; --line: #ebe4da;
+    --brand: #6a5af9; --brand-2: #ff7d5c; --brand-soft: #efecff;
+    --human: #16946a; --human-bg: #e2f5ec; --mixed: #c27a0e; --mixed-bg: #fff2d9; --ai: #e0443a; --ai-bg: #fdebe9;
+    --accent: #5a4ae6;
+    --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+    --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --shadow: 0 1px 2px rgba(28,26,51,.04), 0 12px 32px -12px rgba(28,26,51,.14);
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(900px 500px at 8% -5%, #ffe3d6 0%, transparent 60%),
+                radial-gradient(800px 520px at 100% 0%, #e6e2ff 0%, transparent 60%),
+                radial-gradient(700px 500px at 50% 110%, #dff5ec 0%, transparent 60%); }
+  a { color: var(--accent); }
+  .hidden { display: none !important; }
+
+  /* ---------- Nav ---------- */
+  nav.top { position: sticky; top: 0; z-index: 20; backdrop-filter: saturate(160%) blur(14px); background: rgba(251,247,241,.72); border-bottom: 1px solid rgba(235,228,218,.7); }
+  .nav-in { max-width: 1120px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 18px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-weight: 700; font-size: 1.25rem; color: var(--ink); text-decoration: none; }
+  .logo-mark { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 6px 16px -6px rgba(106,90,249,.6); }
+  .nav-links { margin-left: auto; display: flex; gap: 22px; align-items: center; font-size: .93rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; } .nav-links a:hover { color: var(--ink); }
+
+  /* ---------- Hero ---------- */
+  .hero { max-width: 1120px; margin: 0 auto; padding: 72px 24px 28px; text-align: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: var(--solid); border: 1px solid var(--line); font-size: .85rem; color: var(--muted); box-shadow: var(--shadow); }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+  .hero h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(2.6rem, 6.4vw, 4.6rem); line-height: 1.04; letter-spacing: -1.5px; margin: 22px auto 0; max-width: 900px; }
+  .grad { background: linear-gradient(100deg, var(--brand) 10%, #b45cf0 45%, var(--brand-2) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero .lede { font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: #4a4763; max-width: 720px; margin: 22px auto 0; }
+  .hero .lede strong { color: var(--ink); }
+  .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+  .values { max-width: 1120px; margin: 0 auto; padding: 18px 24px 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .value { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); backdrop-filter: blur(8px); }
+  .value .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 1.25rem; background: var(--brand-soft); margin-bottom: 10px; }
+  .value h3 { margin: 0 0 4px; font-size: 1.02rem; } .value p { margin: 0; color: var(--muted); font-size: .92rem; }
+
+  /* ---------- Layout & cards ---------- */
+  main { max-width: 1120px; margin: 0 auto; padding: 28px 24px 40px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; margin-bottom: 22px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+  .card-title { font-family: var(--serif); font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -.3px; }
+  .card-sub { color: var(--muted); margin: 0 0 16px; font-size: .95rem; }
+  textarea { width: 100%; min-height: 240px; resize: vertical; border: 1.5px solid var(--line); border-radius: 16px; padding: 18px 20px; font: inherit; font-size: 1.02rem; line-height: 1.7; background: var(--solid); color: var(--ink); transition: border-color .15s, box-shadow .15s; }
+  textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(106,90,249,.14); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+  .spacer { flex: 1; }
+  button { font: inherit; font-size: .95rem; border-radius: 12px; padding: 10px 18px; cursor: pointer; border: 1px solid var(--line); background: var(--solid); color: var(--ink); transition: transform .12s, box-shadow .15s, background .15s, border-color .15s; }
+  button:hover { border-color: #d6cdbf; transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+  button.primary { background: linear-gradient(135deg, var(--brand), #8a5cf6); color: #fff; border: none; font-weight: 600; padding: 12px 24px; box-shadow: 0 10px 22px -10px rgba(106,90,249,.75); }
+  button.primary:hover { box-shadow: 0 14px 26px -10px rgba(106,90,249,.85); }
+  button.ghost { background: transparent; }
+  button.big { font-size: 1.02rem; padding: 14px 28px; border-radius: 14px; }
+  button.chipbtn { border-radius: 999px; padding: 7px 14px; font-size: .88rem; background: var(--solid); }
+  button:disabled { opacity: .5; cursor: default; transform: none; }
+  .count { color: var(--muted); font-size: .9rem; }
+  h2 { font-family: var(--serif); font-size: 1.5rem; margin: 0 0 14px; letter-spacing: -.3px; }
+
+  /* ---------- Verdict ---------- */
+  .verdict { display: grid; grid-template-columns: 190px 1fr; gap: 28px; align-items: center; }
+  .gauge { width: 180px; height: 180px; border-radius: 50%; display: grid; place-items: center; transition: background .6s; }
+  .gauge-inner { width: 140px; height: 140px; border-radius: 50%; background: var(--solid); display: grid; place-items: center; text-align: center; box-shadow: inset 0 2px 8px rgba(28,26,51,.06); }
+  .gauge-num { font-size: 2.6rem; font-weight: 750; line-height: 1; letter-spacing: -1px; }
+  .gauge-lbl { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+  .pill { display: inline-block; padding: 6px 14px; border-radius: 999px; font-weight: 650; font-size: .98rem; }
+  .pill.human { background: var(--human-bg); color: var(--human); }
+  .pill.mixed { background: var(--mixed-bg); color: var(--mixed); }
+  .pill.ai { background: var(--ai-bg); color: var(--ai); }
+  .confidence { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+  .breakdown { display: flex; height: 14px; border-radius: 999px; overflow: hidden; margin-top: 16px; background: #eee; }
+  .breakdown span { display: block; height: 100%; transition: width .6s; }
+  .breakdown-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: .84rem; color: #4a4763; }
+  .breakdown-legend b { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+  .c-human_written { background: var(--human); } .c-ai_assisted { background: #eab308; }
+  .c-ai_written_human_edited { background: #f08a3c; } .c-ai_generated { background: var(--ai); }
+
+  /* ---------- Analysis details ---------- */
+  .deep { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }
+  .deep-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .deep-head > div { flex: 1; min-width: 240px; }
+  .deep-card { margin-top: 16px; border: 1px solid var(--line); border-radius: 16px; padding: 20px; background: var(--solid); }
+  .deep-card ul { margin: 6px 0 0; padding-left: 20px; font-size: .92rem; }
+  .deep-card li { margin-bottom: 4px; }
+  .deep-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 12px; }
+  .signal-name { font-weight: 650; }
+  .quote { font-family: var(--serif); font-style: italic; }
+  .err { color: var(--ai); margin-top: 12px; font-size: .92rem; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #d9d3f7; border-top-color: var(--brand); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .match { border-left: 3px solid var(--ai); padding: 10px 14px; margin-top: 10px; background: #fffaf9; border-radius: 0 12px 12px 0; }
+  .match a { color: var(--accent); font-weight: 600; text-decoration: none; word-break: break-word; }
+  .para { display: grid; grid-template-columns: 36px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .para-num { font-weight: 700; color: var(--muted); }
+  .para-text { font-family: var(--serif); font-size: .98rem; padding-left: 12px; border-left: 4px solid; }
+  .tag { display: inline-block; font-size: .74rem; font-weight: 650; padding: 2px 9px; border-radius: 999px; color: #fff; margin: 6px 6px 0 0; }
+  details { margin-top: 14px; } summary { cursor: pointer; font-weight: 600; font-size: .92rem; }
+  .src-list { list-style: none; padding: 0; margin: 8px 0 0; }
+  .src-list li { padding: 7px 0; border-top: 1px dashed var(--line); font-size: .9rem; }
+  .src-list a { color: var(--accent); text-decoration: none; } .src-list a:hover { text-decoration: underline; }
+  .domain { color: var(--muted); font-size: .8rem; }
+  .hit { background: var(--ai-bg); color: var(--ai); font-size: .7rem; font-weight: 750; padding: 2px 7px; border-radius: 6px; margin-left: 6px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 6px 20px; font-size: .86rem; margin-top: 10px; }
+  .stats-grid span { color: var(--muted); }
+
+  /* ---------- Tabs & signals ---------- */
+  .tabs { display: inline-flex; gap: 4px; padding: 5px; margin-bottom: 20px; background: #f3eee6; border-radius: 14px; flex-wrap: wrap; }
+  .tab { border: none; border-radius: 10px; padding: 8px 16px; background: none; color: var(--muted); font-weight: 550; }
+  .tab:hover { transform: none; color: var(--ink); }
+  .tab.active { background: var(--solid); color: var(--ink); box-shadow: 0 2px 8px rgba(28,26,51,.08); }
+  .signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .signal { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; background: var(--solid); }
+  .signal-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .signal-val { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+  .bar { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--human), #eab308, var(--ai)); position: relative; margin: 12px 0 8px; opacity: .9; }
+  .bar .dot { position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); transform: translateX(-50%); box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+  .bar-legend { display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); margin-top: -4px; }
+  .signal p { margin: 8px 0 0; font-size: .88rem; color: #4a4763; }
+  .annotated { font-family: var(--serif); font-size: 1.08rem; line-height: 1.85; white-space: pre-wrap; background: var(--solid); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; }
+  .s { border-radius: 4px; padding: 1px 0; cursor: pointer; }
+  .s:hover { background: var(--brand-soft); }
+  .s.flag { background: var(--ai-bg); border-bottom: 2px solid var(--ai); }
+  .s.flag-soft { background: var(--mixed-bg); }
+  .s.human-mark { background: var(--human-bg); }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: .84rem; color: var(--muted); margin-bottom: 12px; }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 6px; vertical-align: -1px; }
+  .lg-ai::before { background: var(--ai-bg); border-bottom: 2px solid var(--ai); }
+  .lg-mixed::before { background: var(--mixed-bg); }
+  .lg-human::before { background: var(--human-bg); }
+  .phrases { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--ai-bg); color: var(--ai); border-radius: 8px; padding: 3px 10px; font-size: .85rem; }
+  .chip.h { background: var(--human-bg); color: var(--human); }
+  .plag-item { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin-bottom: 10px; background: var(--solid); }
+  .plag-quote { font-family: var(--serif); font-style: italic; margin-bottom: 10px; }
+  .plag-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .plag-links a { text-decoration: none; font-size: .85rem; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); color: var(--accent); background: #fff; }
+  .plag-links a:hover { background: var(--brand-soft); }
+  .note { background: #f6f2ea; border-radius: 14px; padding: 14px 18px; font-size: .92rem; color: #4a4763; }
+  .note strong { color: var(--ink); }
+  .why { columns: 2 300px; column-gap: 32px; font-size: .94rem; color: #4a4763; }
+  .why p { margin: 0 0 14px; break-inside: avoid; }
+  #popover { position: fixed; z-index: 60; max-width: 340px; background: var(--ink); color: #fff; padding: 10px 12px; border-radius: 10px; font-size: .82rem; pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+
+  /* ---------- Mission ---------- */
+  .mission { max-width: 1120px; margin: 0 auto; padding: 10px 24px 30px; }
+  .mission-card { border-radius: 28px; padding: 46px 44px; color: #fff; background: linear-gradient(135deg, #2b2463 0%, #4b3bd1 55%, #a04fd6 100%); box-shadow: 0 30px 60px -30px rgba(75,59,209,.7); position: relative; overflow: hidden; }
+  .mission-card::after { content: ""; position: absolute; width: 380px; height: 380px; right: -120px; top: -140px; border-radius: 50%; background: radial-gradient(circle, rgba(255,125,92,.55), transparent 65%); }
+  .mission-card h2 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); line-height: 1.15; margin: 0 0 14px; max-width: 720px; position: relative; }
+  .mission-card p { font-size: 1.08rem; color: rgba(255,255,255,.86); max-width: 720px; margin: 0 0 12px; position: relative; }
+  .mission-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 24px; position: relative; }
+  .mission-points div { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 16px; padding: 14px 16px; font-size: .95rem; }
+  .mission-points strong { display: block; margin-bottom: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: .84rem; padding: 10px 24px 48px; max-width: 760px; margin: 0 auto; }
+
+  /* ---------- Chat assistant ---------- */
+  .chat-launch { position: fixed; right: 24px; bottom: 24px; z-index: 40; display: flex; align-items: center; gap: 10px; padding: 14px 20px 14px 16px; border-radius: 999px; border: none; color: #fff; font-weight: 650; background: linear-gradient(135deg, var(--brand), var(--brand-2)); box-shadow: 0 18px 36px -12px rgba(106,90,249,.8); }
+  .chat-launch:hover { transform: translateY(-2px); }
+  .chat-panel { position: fixed; right: 24px; bottom: 24px; z-index: 50; width: min(420px, calc(100vw - 32px)); height: min(640px, calc(100vh - 48px)); display: flex; flex-direction: column; background: var(--solid); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 40px 80px -30px rgba(28,26,51,.45); overflow: hidden; animation: pop .18s ease-out; }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+  .chat-head { padding: 16px 18px; display: flex; align-items: center; gap: 12px; color: #fff; background: linear-gradient(135deg, #2b2463, var(--brand)); }
+  .chat-head .avatar { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(255,255,255,.18); }
+  .chat-head .t { font-weight: 700; } .chat-head .s2 { font-size: .8rem; opacity: .8; }
+  .chat-head button { margin-left: auto; background: rgba(255,255,255,.14); border: none; color: #fff; border-radius: 10px; padding: 6px 10px; }
+  .chat-log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fcfaf7; }
+  .msg { max-width: 88%; padding: 11px 14px; border-radius: 16px; font-size: .93rem; line-height: 1.55; word-wrap: break-word; }
+  .msg.user { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 6px; }
+  .msg.bot { align-self: flex-start; background: var(--solid); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+  .msg.bot p { margin: 0 0 8px; } .msg.bot p:last-child { margin-bottom: 0; }
+  .msg.bot ul { margin: 4px 0 8px; padding-left: 18px; }
+  .msg.bot a { color: var(--accent); }
+  .msg .srcs { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .msg .srcs a { font-size: .76rem; text-decoration: none; padding: 3px 9px; border-radius: 999px; background: var(--brand-soft); color: var(--accent); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .msg .searched { margin-top: 8px; font-size: .76rem; color: var(--muted); }
+  .chat-sugg { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 0; background: #fcfaf7; }
+  .chat-sugg button { font-size: .8rem; padding: 6px 11px; border-radius: 999px; background: var(--solid); }
+  .chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); background: var(--solid); }
+  .chat-form textarea { min-height: 44px; height: 44px; max-height: 120px; padding: 11px 14px; border-radius: 14px; font-size: .93rem; resize: none; }
+  .chat-form button { padding: 0 16px; border-radius: 14px; }
+
+  @media (max-width: 680px) {
+    .verdict { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .nav-links { display: none; }
+    .logo { white-space: nowrap; }
+    .chat-launch { right: 16px; bottom: 16px; }
+    .hero { padding-top: 48px; }
+    .mission-card { padding: 32px 24px; }
+    .chat-panel { right: 16px; bottom: 16px; }
+  }
+</style>
+</head>
+<body>
+<nav class="top">
+  <div class="nav-in">
+    <a class="logo" href="#">
+      <span class="logo-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5z"/><path d="M12 6v13.5"/><path d="M8.2 11.2c.6-.7 1.6-.7 2.1 0 .5-.7 1.5-.7 2.1 0" stroke-width="1.6"/></svg></span>
+      Human Touch
+    </a>
+    <div class="nav-links">
+      <a href="#check">Check a text</a>
+      <a href="#mission">Why it matters</a>
+      <a href="#how">How to read results</a>
+      <button class="chipbtn" id="navChat">💬 Ask the assistant</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <span class="eyebrow"><span class="dot"></span>For parents, teachers &amp; everyone who reads</span>
+  <h1>What are our children <span class="grad">reading?</span></h1>
+  <p class="lede">More and more of the stories, books and articles our kids read are written by machines. <strong>Human Touch helps you see whether a real person — with real emotions, empathy and judgement — wrote the words in front of you.</strong></p>
+  <div class="hero-cta">
+    <button class="primary big" onclick="document.getElementById('check').scrollIntoView();document.getElementById('input').focus({preventScroll:true})">Check a text now</button>
+    <button class="big ghost" onclick="document.getElementById('mission').scrollIntoView()">Why it matters →</button>
+  </div>
+</header>
+
+<section class="values">
+  <div class="value"><div class="ico">🧒</div><h3>Made for what kids read</h3><p>Picture books, school reading, stories and articles — checked with care, because simple writing isn't a sign of AI.</p></div>
+  <div class="value"><div class="ico">⚖️</div><h3>Human, AI — or in between</h3><p>Not just a score: human-written, AI-assisted, AI-written then edited, or AI-generated, paragraph by paragraph.</p></div>
+  <div class="value"><div class="ico">🔍</div><h3>Shows its evidence</h3><p>Every verdict explains why, and every web source is a link you can open and read yourself.</p></div>
+  <div class="value"><div class="ico">🤝</div><h3>Honest by design</h3><p>When it's too close to call, we say so. A false accusation is worse than an honest "uncertain".</p></div>
+</section>
+
+<main>
+  <section class="card" id="check">
+    <h2 class="card-title">Check a text</h2>
+    <p class="card-sub">Paste a page from a book, a story, an essay or an article. 150+ words gives the clearest answer.</p>
+    <textarea id="input" placeholder="Paste the text you want to check here…"></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">✨ Check this text</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="spacer"></span>
+      <span class="count" id="count">0 words</span>
+    </div>
+    <div class="row">
+      <span class="count">Or try an example:</span>
+      <button class="chipbtn" id="sampleHuman">Personal essay</button>
+      <button class="chipbtn" id="sampleAI">AI-style article</button>
+      <button class="chipbtn" id="sampleKids">AI-style children's story</button>
+    </div>
+  </section>
+
+  <div id="results" class="hidden">
+    <section class="card">
+      <div class="verdict">
+        <div class="gauge" id="gauge"><div class="gauge-inner"><div><div class="gauge-num" id="score">0</div><div class="gauge-lbl" id="gaugeLbl">quick pattern score</div></div></div></div>
+        <div>
+          <h2 style="margin-bottom:10px">Verdict <span class="count" id="verdictSource" style="font-family:var(--sans);font-size:.85rem;font-weight:400"></span></h2>
+          <span class="pill" id="verdictPill"></span>
+          <p id="verdictText" style="margin:12px 0 0"></p>
+          <div id="breakdownWrap" class="hidden">
+            <div class="breakdown" id="breakdown"></div>
+            <div class="breakdown-legend" id="breakdownLegend"></div>
+          </div>
+          <div class="confidence" id="confidence"></div>
+          <div class="confidence" id="quickNote"></div>
+        </div>
+      </div>
+      <div class="deep" id="deepBox">
+        <div class="deep-head">
+          <div>
+            <div class="signal-name">Detailed analysis</div>
+            <div class="count" id="deepStatus">Reads the text paragraph by paragraph, the way a careful editor would, and explains its reasoning. Runs automatically.</div>
+          </div>
+          <button id="deepBtn">Run again</button>
+          <button class="chipbtn" id="askAboutResult">💬 Ask about this result</button>
+        </div>
+        <div id="deepResult"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="signals">Signals</button>
+        <button class="tab" data-tab="text">Highlighted text</button>
+        <button class="tab" data-tab="plag">Find copies online</button>
+      </div>
+
+      <div data-panel="signals">
+        <div class="signals" id="signals"></div>
+        <div style="margin-top:20px">
+          <div class="signal-name" style="margin-bottom:8px">Words and phrases AI tools tend to overuse</div>
+          <div class="phrases" id="aiPhrases"></div>
+          <div class="signal-name" style="margin:16px 0 8px">Signs of a personal human voice</div>
+          <div class="phrases" id="humanPhrases"></div>
+        </div>
+      </div>
+
+      <div data-panel="text" class="hidden">
+        <div class="legend">
+          <span class="lg-ai">Uses several AI-typical phrases</span>
+          <span class="lg-mixed">Uses one AI-typical phrase</span>
+          <span class="lg-human">Personal / specific detail</span>
+        </div>
+        <p class="count" style="margin-top:0">Hover a sentence to see why it's marked. Click any sentence to search the web for it.</p>
+        <div class="annotated" id="annotated"></div>
+      </div>
+
+      <div data-panel="plag" class="hidden">
+        <div style="margin:0 0 18px">
+          <div class="deep-head">
+            <div>
+              <div class="signal-name">Automatic web search</div>
+              <div class="count" id="plagStatus">Runs exact-phrase searches for the most distinctive sentences, checks the pages it finds, and lists every source so you can read them yourself.</div>
+            </div>
+            <button class="primary" id="plagBtn">Search the web now</button>
+            <button class="chipbtn" id="askRefine">💬 Refine with the assistant</button>
+          </div>
+          <div id="plagResult"></div>
+        </div>
+        <div class="signal-name" style="margin-bottom:8px">Or check by hand</div>
+        <div class="note" style="margin-bottom:14px">
+          These are the most <strong>distinctive</strong> sentences in your text — the ones least likely to appear anywhere else by chance.
+          Each link runs an exact-quote search. If a search finds the same sentence word-for-word on another site or in a book, that's a strong sign it was copied (or that the other site copied it).
+        </div>
+        <div id="plagList"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" id="how">
+    <h2>How to read the results</h2>
+    <div class="why">
+      <p><strong>This is evidence, not proof.</strong> No tool — including expensive commercial detectors — can tell for certain whether text was written by AI. Treat the result as a reason to look closer, never as a final judgement about a person.</p>
+      <p><strong>False alarms happen.</strong> Formal, polished, or very simple writing can look "AI-like". So can writing by people who learned English as a second language, and simple children's prose. Please never accuse someone based on this result alone.</p>
+      <p><strong>Four kinds of authorship.</strong> <em>Human-written</em>: no AI involved. <em>AI-assisted</em>: a person's own ideas and draft, polished or expanded by AI — human substance, machine-smooth surface. <em>AI-written, human-edited</em>: an AI draft that a person revised — machine skeleton, human patches. <em>AI-generated</em>: AI output used as-is. The middle two are the hardest to tell apart, so read the percentages, not just the label.</p>
+      <p><strong>Human writing has fingerprints:</strong> uneven rhythm, specific memories, names, places and numbers, opinions, small imperfections, and a voice that takes a side. AI writing tends to be smooth, balanced, general, and evenly paced.</p>
+    </div>
+  </section>
+</main>
+
+<section class="mission" id="mission">
+  <div class="mission-card">
+    <h2>The stories our children read shape who they become.</h2>
+    <p>Children learn empathy, courage and what it means to be human from the books in their hands. As AI writes more of what we read, families deserve to know when there's a real person — with real feelings, judgement and a point of view — behind the words.</p>
+    <p>Human Touch doesn't oppose AI. It makes authorship visible, so parents, teachers and readers can choose with their eyes open.</p>
+    <div class="mission-points">
+      <div><strong>For parents</strong>Check the picture books, stories and apps your children read.</div>
+      <div><strong>For teachers &amp; librarians</strong>Understand what's on the reading list — without accusing anyone.</div>
+      <div><strong>For authors</strong>Show readers the human craft behind your work.</div>
+    </div>
+  </div>
+</section>
+
+<footer>The quick pattern score runs entirely in your browser. When you check a text, search the web or ask the assistant, the text is sent to Anthropic's API for analysis. Nothing is stored. Results are evidence, not proof.</footer>
+
+<div id="popover" class="hidden"></div>
+
+<button class="chat-launch" id="chatLaunch"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01" stroke-width="2.6"/></svg>Ask Human Touch</button>
+<div class="chat-panel hidden" id="chatPanel" role="dialog" aria-label="Human Touch assistant">
+  <div class="chat-head">
+    <div class="avatar">✨</div>
+    <div><div class="t">Human Touch assistant</div><div class="s2" id="chatSub">Ask about your text, or refine the search</div></div>
+    <button id="chatClose" aria-label="Close">✕</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-sugg" id="chatSugg"></div>
+  <form class="chat-form" id="chatForm">
+    <textarea id="chatInput" placeholder="Ask a question…" rows="1"></textarea>
+    <button class="primary" id="chatSend" type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+// ---------- Word lists ----------
+const AI_PHRASES = [
+  "delve", "delves", "delving", "tapestry", "testament to", "in today's fast-paced", "in today's world", "in today's digital",
+  "ever-evolving", "ever-changing", "navigate the complexities", "navigating the complexities", "navigate the", "realm",
+  "it's important to note", "it is important to note", "it's worth noting", "it is worth noting", "it's essential to", "it is essential to",
+  "in conclusion", "in summary", "ultimately,", "overall,", "furthermore", "moreover", "additionally", "in addition,",
+  "embark", "embarking", "journey of", "unlock", "unlocking", "unleash", "harness", "harnessing", "elevate", "elevating",
+  "seamless", "seamlessly", "leverage", "leveraging", "multifaceted", "nuanced", "underscore", "underscores", "pivotal",
+  "intricate", "intricacies", "showcase", "showcasing", "vibrant", "bustling", "crucial", "robust", "comprehensive",
+  "foster", "fostering", "resonate", "resonates", "paramount", "holistic", "dynamic", "landscape", "transformative",
+  "game-changer", "game changer", "cutting-edge", "plays a crucial role", "plays a vital role", "plays a pivotal role",
+  "a myriad of", "myriad", "plethora", "whether you're", "not only", "serves as a", "stands as a", "a rich", "rich tapestry",
+  "boundless", "enchanting", "whimsical", "a sense of wonder", "heartwarming", "valuable lesson", "learned that", "the power of",
+  "never give up", "embrace", "embracing", "meticulous", "meticulously", "commendable", "notably", "remarkable",
+  "let's dive", "dive into", "dive deep", "key takeaways", "in the realm of", "at the end of the day", "strike a balance",
+  "a beacon of", "beacon", "symphony", "kaleidoscope", "unwavering", "profound", "invaluable", "everchanging", "align with",
+  "empower", "empowering", "streamline", "navigating"
+];
+const TRANSITION_OPENERS = ["additionally", "furthermore", "moreover", "however", "overall", "ultimately", "in addition", "in conclusion",
+  "consequently", "therefore", "thus", "importantly", "notably", "similarly", "conversely", "in summary", "as a result", "by contrast", "in essence", "finally"];
+const INFORMAL = ["gonna", "wanna", "kinda", "sorta", "yeah", "nope", "lol", "ugh", "honestly", "basically", "stuff", "pretty much",
+  "anyway", "okay", "ok", "dunno", "damn", "crap", "hmm", "huh", "y'know", "you know", "i mean", "i guess", "i think", "i remember",
+  "my mom", "my dad", "my wife", "my husband", "my kid", "my son", "my daughter", "my grandmother", "my grandfather", "my friend"];
+const STOP = new Set("a an the and or but if then so of to in on at by for with from as is are was were be been being it its this that these those i you he she we they me him her us them my your his our their not no do does did have has had will would can could should may might must just very also than too into out up down over about after before when while there here what which who whom whose how why all any each some such only own same other more most".split(" "));
+
+// ---------- Text helpers ----------
+function splitSentences(text) {
+  const out = [];
+  const re = /[^.!?\n]+(?:[.!?]+["'”’)\]]*|\n|$)/g;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    if (m[0].trim().length) out.push({ text: m[0], start: m.index });
+    if (m.index === re.lastIndex) re.lastIndex++;
+  }
+  return out;
+}
+const words = t => (t.toLowerCase().match(/[a-z’']+(?:-[a-z]+)*/g) || []);
+const mean = a => a.reduce((s, x) => s + x, 0) / (a.length || 1);
+const sd = a => { const m = mean(a); return Math.sqrt(mean(a.map(x => (x - m) ** 2))); };
+const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function findPhrases(textLower, list) {
+  const found = {};
+  for (const p of list) {
+    const pat = p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/'/g, "['’]");
+    const re = new RegExp("(^|[^a-z])" + pat + "(?=[^a-z]|$)", "g");
+    const n = (textLower.match(re) || []).length;
+    if (n) found[p] = n;
+  }
+  // drop phrases that are substrings of other found phrases (e.g. "realm" inside "in the realm of")
+  for (const a of Object.keys(found)) for (const b of Object.keys(found))
+    if (a !== b && b.includes(a) && found[a] <= found[b]) delete found[a];
+  return found;
+}
+const sum = obj => Object.values(obj).reduce((s, x) => s + x, 0);
+
+// ---------- Analysis ----------
+function analyze(text) {
+  const lower = text.toLowerCase();
+  const w = words(text);
+  const nWords = w.length;
+  const per100 = x => (x / Math.max(nWords, 1)) * 100;
+  const sents = splitSentences(text).filter(s => words(s.text).length > 0);
+  const lens = sents.map(s => words(s.text).length);
+  const signals = [];
+
+  // 1. Rhythm / burstiness
+  const cv = sd(lens) / (mean(lens) || 1);
+  signals.push({
+    name: "Sentence rhythm", weight: 0.24, ai: clamp((0.75 - cv) / 0.45),
+    value: `variation ${cv.toFixed(2)}`,
+    explain: cv < 0.4 ? "Sentences are very evenly sized. AI tends to write in a steady, uniform rhythm."
+          : cv > 0.65 ? "Sentence lengths swing a lot — short punches next to long, winding ones. That's typical of people."
+          : "A moderate mix of short and long sentences."
+  });
+
+  // 2. AI vocabulary
+  const aiFound = findPhrases(lower, AI_PHRASES);
+  const aiDensity = per100(sum(aiFound));
+  signals.push({
+    name: "AI-typical vocabulary", weight: 0.26, ai: clamp(aiDensity / 1.6),
+    value: `${sum(aiFound)} hits · ${aiDensity.toFixed(1)}/100 words`,
+    explain: aiDensity > 1 ? "Lots of words and phrases that AI models statistically overuse (\"delve\", \"tapestry\", \"it's important to note\"…)."
+          : aiDensity > 0.3 ? "Some phrases AI tools favour, though people use them too."
+          : "Very few of the stock phrases that AI tools tend to lean on."
+  });
+
+  // 3. Personal voice
+  const contractions = (text.match(/\b\w+['’](t|s|re|ve|ll|d|m)\b/gi) || []).length;
+  const firstPerson = (lower.match(/\b(i|i'm|i’m|i've|i’ve|i'd|i’d|me|my|mine|myself)\b/g) || []).length;
+  const humanFound = findPhrases(lower, INFORMAL);
+  const questionsExcl = (text.match(/[?!]/g) || []).length;
+  const voice = per100(contractions * 0.6 + firstPerson * 0.6 + sum(humanFound) * 1.5 + questionsExcl * 0.5);
+  signals.push({
+    name: "Personal voice", weight: 0.10, ai: clamp(1 - voice / 5), // low weight: easy for AI to imitate
+    value: `${firstPerson} first-person · ${contractions} contractions`,
+    explain: voice > 4 ? "Strong personal voice: \"I\", contractions, asides, questions — the way real people talk."
+          : voice > 1.5 ? "Some personal voice, but fairly reserved."
+          : "Impersonal and polished. Little sense of a specific person speaking."
+  });
+
+  // 4. Specific details
+  const numbers = (text.match(/\b\d[\d,.:/]*\b/g) || []).length;
+  const properNouns = sents.reduce((acc, s) => {
+    const toks = s.text.trim().split(/\s+/).slice(1);
+    return acc + toks.filter(t => /^[A-Z][a-z]{2,}/.test(t) && !STOP.has(t.toLowerCase())).length;
+  }, 0);
+  const specific = per100(numbers + properNouns * 0.8);
+  signals.push({
+    name: "Concrete details", weight: 0.14, ai: clamp(1 - specific / 4),
+    value: `${numbers} numbers · ${properNouns} names/places`,
+    explain: specific > 3 ? "Full of specifics — names, places, dates, numbers. Lived experience usually shows up like this."
+          : specific > 1 ? "A few specific details."
+          : "Mostly general statements with few names, dates or numbers. AI often stays vague and universal."
+  });
+
+  // 5. Formulaic structure
+  const transitionStarts = sents.filter(s => {
+    const t = s.text.trim().toLowerCase();
+    return TRANSITION_OPENERS.some(o => t.startsWith(o + ",") || t.startsWith(o + " "));
+  }).length;
+  const triads = (text.match(/\b[\w-]+(?: [\w-]+)?, [\w-]+(?: [\w-]+)?,? and [\w-]+/g) || []).length;
+  const emDash = (text.match(/—|--/g) || []).length;
+  const formula = (transitionStarts / Math.max(sents.length, 1)) * 2.2 + per100(triads) * 0.35 + per100(emDash) * 0.15;
+  signals.push({
+    name: "Formulaic structure", weight: 0.18, ai: clamp(formula / 0.7),
+    value: `${transitionStarts} transition openers · ${triads} lists of three`,
+    explain: formula > 0.5 ? "Many sentences open with \"Moreover\", \"Additionally\", \"Ultimately\"… and ideas come in neat groups of three — classic AI structure."
+          : formula > 0.2 ? "Some textbook-style transitions and tidy lists."
+          : "Structure feels natural rather than templated."
+  });
+
+  // 6. Tidy arc: neat moral/epiphany ending + evenly sized paragraphs (AI imitating a personal voice still does this)
+  const lastBit = sents.slice(-2).map(s => s.text).join(" ").toLowerCase();
+  const moral = /\b(learn(ed|t)|realiz|realis|the (true|real) (treasure|lesson|gift|meaning)|what (really )?matters|anything is possible|never give up|in the end|reminds? (me|us)|some things|maybe (that's|that is)|and that's (okay|fine|enough)|the power of|together,|from that day)/.test(lastBit);
+  const paraLens = text.split(/\n\s*\n|\n/).map(p => words(p).length).filter(n => n > 0);
+  const paraCV = paraLens.length > 2 ? sd(paraLens) / (mean(paraLens) || 1) : 1;
+  const tidy = (moral ? 0.65 : 0.15) + (paraCV < 0.3 ? 0.3 : paraCV < 0.45 ? 0.15 : 0);
+  signals.push({
+    name: "Tidy ending & shape", weight: 0.12, ai: clamp(tidy),
+    value: `${moral ? "moral/epiphany ending" : "open ending"} · ${paraLens.length} paragraphs`,
+    explain: tidy > 0.6 ? "Wraps up with a neat lesson or epiphany, in evenly sized paragraphs. AI writing — even when imitating a personal voice — tends to resolve this tidily."
+          : tidy > 0.35 ? "Somewhat tidy shape or ending."
+          : "Ends without a neat bow, and the shape is uneven — more typical of people."
+  });
+
+  // Overall
+  const totalW = signals.reduce((s, x) => s + x.weight, 0);
+  let score = signals.reduce((s, x) => s + x.ai * x.weight, 0) / totalW;
+  score = Math.round(clamp((score - 0.15) / 0.7) * 100); // stretch to 0–100
+
+  // Sentence annotation
+  const sentInfo = sents.map(s => {
+    const l = s.text.toLowerCase();
+    const ai = Object.keys(findPhrases(l, AI_PHRASES));
+    const hum = Object.keys(findPhrases(l, INFORMAL));
+    if (/\b(i|my|me)\b/.test(l)) hum.push("first person");
+    if (/\b\d/.test(s.text)) hum.push("specific number");
+    return { ...s, ai, hum };
+  });
+
+  return { score, signals, aiFound, humanFound, sents: sentInfo, nWords };
+}
+
+// ---------- Plagiarism candidates ----------
+function distinctiveSentences(sents, k = 6) {
+  return sents
+    .map(s => {
+      const clean = s.text.trim().replace(/\s+/g, " ");
+      const ws = words(clean);
+      const content = ws.filter(x => !STOP.has(x));
+      const score = content.length + content.filter(x => x.length > 7).length * 0.7 + new Set(content).size * 0.3;
+      return { clean, score, n: ws.length };
+    })
+    .filter(s => s.n >= 8)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, k);
+}
+function searchQuote(sentence) {
+  // Search engines handle ~30 words max in a quote; trim to a strong core.
+  const ws = sentence.replace(/[“”"]/g, "").replace(/[.!?]+$/, "").split(" ");
+  return ws.length > 24 ? ws.slice(0, 24).join(" ") : ws.join(" ");
+}
+function searchLinks(sentence) {
+  const q = encodeURIComponent(`"${searchQuote(sentence)}"`);
+  return [
+    ["Google", `https://www.google.com/search?q=${q}`],
+    ["Bing", `https://www.bing.com/search?q=${q}`],
+    ["DuckDuckGo", `https://duckduckgo.com/?q=${q}`],
+    ["Google Books", `https://www.google.com/search?tbm=bks&q=${q}`],
+    ["Google Scholar", `https://scholar.google.com/scholar?q=${q}`],
+  ];
+}
+
+// ---------- Rendering ----------
+const $ = id => document.getElementById(id);
+function render(r, text) {
+  $("results").classList.remove("hidden");
+  const band = r.score < 35 ? "human" : r.score < 62 ? "mixed" : "ai";
+  const color = { human: "var(--human)", mixed: "var(--mixed)", ai: "var(--ai)" }[band];
+  $("score").textContent = r.score;
+  $("score").style.color = color;
+  $("gauge").style.background = `conic-gradient(${color} ${r.score * 3.6}deg, #eee 0)`;
+  const pill = $("verdictPill");
+  pill.className = "pill " + band;
+  pill.textContent = { human: "Likely written by a human", mixed: "Mixed — possibly AI-assisted", ai: "Likely AI-generated" }[band];
+  $("verdictText").textContent = {
+    human: "This text shows the uneven rhythm, personal voice and concrete detail that people tend to leave behind.",
+    mixed: "Some patterns point to a person, others to an AI. That fits AI-assisted writing, an AI draft edited by a person — or simply a very formal human style.",
+    ai: "This text has many hallmarks of AI writing: steady rhythm, stock phrases, tidy structure and few personal or specific details."
+  }[band];
+  $("confidence").textContent = r.nWords < 80
+    ? `⚠ Only ${r.nWords} words — too short for a reliable reading. Paste at least 80, ideally 250+.`
+    : r.nWords < 250 ? `Confidence: moderate (${r.nWords} words). Longer passages give clearer results.`
+    : `Confidence: better (${r.nWords} words analysed). Still a probability, not proof.`;
+
+  $("signals").innerHTML = r.signals.map(s => `
+    <div class="signal">
+      <div class="signal-head"><span class="signal-name">${s.name}</span><span class="signal-val">${esc(s.value)}</span></div>
+      <div class="bar"><span class="dot" style="left:${(s.ai * 100).toFixed(0)}%"></span></div>
+      <div class="bar-legend"><span>human-like</span><span>AI-like</span></div>
+      <p>${esc(s.explain)}</p>
+    </div>`).join("");
+
+  const chips = (obj, cls) => Object.keys(obj).length
+    ? Object.entries(obj).sort((a, b) => b[1] - a[1]).map(([p, n]) => `<span class="chip ${cls}">${esc(p)}${n > 1 ? " ×" + n : ""}</span>`).join("")
+    : `<span class="count">None found</span>`;
+  $("aiPhrases").innerHTML = chips(r.aiFound, "");
+  $("humanPhrases").innerHTML = chips(r.humanFound, "h");
+
+  // Annotated text
+  let html = "", cursor = 0;
+  r.sents.forEach((s, i) => {
+    html += esc(text.slice(cursor, s.start));
+    const cls = s.ai.length >= 2 ? "flag" : s.ai.length === 1 ? "flag-soft" : s.hum.length ? "human-mark" : "";
+    html += `<span class="s ${cls}" data-i="${i}">${esc(s.text)}</span>`;
+    cursor = s.start + s.text.length;
+  });
+  html += esc(text.slice(cursor));
+  $("annotated").innerHTML = html;
+  $("annotated").querySelectorAll(".s").forEach(el => {
+    const s = r.sents[+el.dataset.i];
+    el.addEventListener("mousemove", e => {
+      const parts = [];
+      if (s.ai.length) parts.push("AI-typical: " + s.ai.join(", "));
+      if (s.hum.length) parts.push("Human signals: " + [...new Set(s.hum)].join(", "));
+      parts.push("Click to search the web for this sentence");
+      const p = $("popover");
+      p.textContent = parts.join("  •  ");
+      p.classList.remove("hidden");
+      p.style.left = Math.min(e.clientX + 14, innerWidth - 360) + "px";
+      p.style.top = (e.clientY + 16) + "px";
+    });
+    el.addEventListener("mouseleave", () => $("popover").classList.add("hidden"));
+    el.addEventListener("click", () => window.open(searchLinks(s.text.trim())[0][1], "_blank", "noopener"));
+  });
+
+  // Plagiarism
+  const cands = distinctiveSentences(r.sents);
+  current = { text, score: r.score, words: r.nWords, sentences: cands.map(c => c.clean) };
+  deepRun++;  // ignore any analysis still running for the previous text
+  lastDeep = null; lastPlag = null;
+  if (typeof chatHistory !== "undefined" && chatHistory.length) {
+    chatHistory = [];
+    addMsg("bot", `<span class="count">New text loaded — I'll answer about this one from now on.</span>`);
+  }
+  $("deepResult").innerHTML = "";
+  $("plagResult").innerHTML = "";
+  $("deepBtn").disabled = !apiReady;
+  $("verdictSource").textContent = apiReady ? "— quick pattern check (Claude's analysis is on its way)" : "— quick pattern check";
+  $("gaugeLbl").textContent = "quick pattern score";
+  $("breakdownWrap").classList.add("hidden");
+  $("quickNote").textContent = apiReady ? "" : "This quick check counts surface patterns and can be fooled — e.g. by AI imitating a personal voice. Add an API key for Claude's detailed analysis.";
+  $("plagList").innerHTML = cands.length ? cands.map(c => `
+    <div class="plag-item">
+      <div class="plag-quote">“${esc(searchQuote(c.clean))}${c.n > 24 ? "…" : ""}”</div>
+      <div class="plag-links">${searchLinks(c.clean).map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${n} ↗</a>`).join("")}</div>
+    </div>`).join("")
+    : `<p class="count">No sentences long enough to search for (need 8+ words).</p>`;
+}
+
+// ---------- Claude-powered checks (need server.py + API key) ----------
+let current = null;           // { text, sentences }
+let apiReady = false;
+const NO_SERVER = "Needs the local server with an Anthropic API key — see README.md for the 2-minute setup.";
+
+async function checkStatus() {
+  try {
+    const s = await (await fetch("/api/status")).json();
+    apiReady = !!s.ready;
+  } catch { apiReady = false; }
+  if (!apiReady) {
+    $("deepStatus").textContent = NO_SERVER;
+    $("plagStatus").textContent = NO_SERVER;
+    $("deepBtn").disabled = $("plagBtn").disabled = true;
+  }
+}
+
+async function callApi(path, body) {
+  const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({ error: "Unexpected response from the server." }));
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+const list = items => items && items.length ? `<ul>${items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="count">None noted</p>`;
+
+const CAT = {
+  human_written:           { label: "Human-written",            band: "human", desc: "A person wrote this without AI help." },
+  ai_assisted:             { label: "AI-assisted",              band: "mixed", desc: "A person wrote it; an AI polished, corrected or expanded it." },
+  ai_written_human_edited: { label: "AI-written, human-edited", band: "mixed", desc: "An AI drafted it; a person then revised it." },
+  ai_generated:            { label: "AI-generated",             band: "ai",    desc: "An AI wrote it and it was used largely as-is." },
+  uncertain:               { label: "Uncertain",                band: "mixed", desc: "The evidence doesn't clearly favour any one category." },
+};
+const ORDER = ["human_written", "ai_assisted", "ai_written_human_edited", "ai_generated"];
+const domainOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+const prettyAge = a => {
+  const m = /^(\d+) days? ago$/.exec(a || "");
+  if (!m) return a || "";
+  const d = +m[1];
+  return d < 60 ? a : d < 730 ? `${Math.round(d / 30)} months ago` : `${Math.round(d / 365)} years ago`;
+};
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? esc(u) : "#";
+let deepRun = 0;
+
+async function runDeep() {
+  if (!current) return;
+  const run = ++deepRun, snapshot = current;
+  const btn = $("deepBtn"), out = $("deepResult");
+  btn.disabled = true;
+  out.innerHTML = `<p class="count"><span class="spinner"></span>Claude is reading the text paragraph by paragraph… (usually 20–60 seconds)</p>`;
+  try {
+    const d = await callApi("/api/ai-check", { text: snapshot.text });
+    if (run !== deepRun) return;  // a newer check started meanwhile
+    lastDeep = d;
+    const cat = CAT[d.verdict] || CAT.uncertain;
+
+    // Main verdict now comes from Claude
+    $("verdictSource").textContent = "— from Claude's analysis";
+    $("verdictPill").className = "pill " + cat.band;
+    $("verdictPill").textContent = d.verdict === "uncertain" ? `Too close to call — leans ${CAT[d.leans].label}` : cat.label;
+    $("verdictText").textContent = d.summary;
+    const color = { human: "var(--human)", mixed: "var(--mixed)", ai: "var(--ai)" }[d.ai_involvement < 35 ? "human" : d.ai_involvement < 62 ? "mixed" : "ai"];
+    $("score").textContent = d.ai_involvement;
+    $("score").style.color = color;
+    $("gauge").style.background = `conic-gradient(${color} ${d.ai_involvement * 3.6}deg, #eee 0)`;
+    $("gaugeLbl").textContent = "AI involvement";
+    $("breakdown").innerHTML = ORDER.map(c => `<span class="c-${c}" style="width:${d.probabilities[c]}%" title="${CAT[c].label}: ${d.probabilities[c]}%"></span>`).join("");
+    $("breakdownLegend").innerHTML = ORDER.map(c => `<span><b class="c-${c}"></b>${CAT[c].label} <strong>${d.probabilities[c]}%</strong></span>`).join("");
+    $("breakdownWrap").classList.remove("hidden");
+    $("confidence").textContent = `Claude's confidence: ${d.confidence}. ${snapshot.words < 150 ? "Short texts carry little evidence — treat this cautiously." : "Still a probability, not proof."}`;
+    const disagree = Math.abs(d.ai_involvement - snapshot.score) > 30;
+    $("quickNote").textContent = `The quick pattern check alone scored ${snapshot.score}/100.` +
+      (disagree ? " It disagrees with Claude — pattern counts are easy to fool (e.g. AI imitating a personal voice), so Claude's reading is the better guide." : " It broadly agrees.");
+
+    const paras = (d.paragraphs || []).map(p => {
+      const c = CAT[p.label] || CAT.uncertain, txt = (d.paragraph_texts || [])[p.paragraph - 1] || "";
+      return `<div class="para"><div class="para-num">¶${p.paragraph}</div><div>
+        <div class="para-text" style="border-color:var(--${c.band === "human" ? "human" : c.band === "ai" ? "ai" : "mixed"})">${esc(txt.length > 260 ? txt.slice(0, 260) + "…" : txt)}</div>
+        <span class="tag c-${p.label}">${c.label}</span><span class="count">${esc(p.why)}</span></div></div>`;
+    }).join("");
+    const mixedParas = new Set((d.paragraphs || []).map(p => p.label)).size > 1;
+    const s = d.stats || {};
+    out.innerHTML = `<div class="deep-card">
+      ${d.recognized_source ? `<p style="margin:0 0 10px"><strong>Recognised as a published work:</strong> ${esc(d.recognized_source)}</p>` : ""}
+      <div class="deep-cols" style="margin-top:0">
+        <div><div class="signal-name" style="color:var(--human)">Evidence of a human author</div>${list(d.evidence_for_human)}</div>
+        <div><div class="signal-name" style="color:var(--ai)">Evidence of AI involvement</div>${list(d.evidence_for_ai)}</div>
+      </div>
+      ${paras ? `<div style="margin-top:16px"><div class="signal-name">Paragraph by paragraph</div>
+        <p class="count" style="margin:2px 0 6px">${mixedParas ? "Paragraphs read differently from each other — a common sign of mixed human/AI authorship." : "All paragraphs read consistently."}</p>${paras}</div>` : ""}
+      ${d.notable_passages && d.notable_passages.length ? `<div style="margin-top:14px"><div class="signal-name">Telling passages</div>
+        ${d.notable_passages.map(p => `<div class="match" style="border-left-color:${p.leans === "ai" ? "var(--ai)" : "var(--human)"}">
+          <span class="quote">“${esc(p.quote)}”</span><div class="count">${p.leans === "ai" ? "Leans AI" : "Leans human"} — ${esc(p.why)}</div></div>`).join("")}</div>` : ""}
+      ${d.what_would_change_my_mind ? `<p class="count" style="margin:14px 0 0"><strong>What would change this verdict:</strong> ${esc(d.what_would_change_my_mind)}</p>` : ""}
+      <details><summary>Measurements Claude was given</summary><div class="stats-grid">
+        <div><span>Sentence-length variation:</span> ${s.sentence_length_variation_cv} <span>(people ≈ 0.6+, AI ≈ 0.3–0.5)</span></div>
+        <div><span>Sentences (shortest–longest words):</span> ${s.sentences} (${(s.shortest_and_longest_sentence || []).join("–")})</div>
+        <div><span>Paragraph-length variation:</span> ${s.paragraph_length_variation_cv}</div>
+        <div><span>Vocabulary diversity:</span> ${s.vocabulary_diversity_first_200_words}</div>
+        <div><span>Stock AI phrases /100 words:</span> ${s.stock_ai_phrases_per_100_words}</div>
+        <div><span>Contractions /100 words:</span> ${s.contractions_per_100_words}</div>
+        <div><span>First person /100 words:</span> ${s.first_person_per_100_words}</div>
+        <div><span>Em dashes /100 words:</span> ${s.em_dashes_per_100_words}</div>
+      </div></details>
+    </div>`;
+  } catch (e) {
+    if (run === deepRun) out.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+  } finally { if (run === deepRun) btn.disabled = false; }
+}
+
+async function runPlag() {
+  if (!current) return;
+  const btn = $("plagBtn"), out = $("plagResult");
+  btn.disabled = true;
+  out.innerHTML = `<p class="count"><span class="spinner"></span>Searching the web and checking the pages it finds… (usually 30–90 seconds)</p>`;
+  try {
+    const d = await callApi("/api/plagiarism", { text: current.text, sentences: current.sentences });
+    lastPlag = d;
+    const band = { no_matches_found: "human", possible_matches: "mixed", likely_copied: "ai" }[d.verdict] || "mixed";
+    const label = { no_matches_found: "No copies found", possible_matches: "Possible matches", likely_copied: "Likely copied" }[d.verdict] || d.verdict;
+    const matched = new Set(d.matches.map(m => m.url));
+    const searches = (d.searches || []).filter(s => s.results.length);
+    out.innerHTML = `<div class="deep-card">
+      <div class="row" style="margin:0"><span class="pill ${band}">${label}</span>
+        <span class="count">${(d.searches || []).length} searches · ${d.pages_checked} pages found</span></div>
+      <p style="margin:12px 0 0">${esc(d.summary || "")}</p>
+      ${d.matches.length ? `<div class="signal-name" style="margin-top:14px">References with matching wording</div>` : ""}
+      ${d.matches.map(m => `<div class="match">
+        <a href="${safeUrl(m.url)}" target="_blank" rel="noopener">${esc(m.title || m.url)} ↗</a> <span class="domain">${esc(domainOf(m.url))}</span>
+        <div class="count">${esc((m.match_type || "").replace("_", " "))} match — ${esc(m.note || "")}</div>
+        ${m.matched_text ? `<div style="margin-top:6px;font-size:.88rem"><span class="count">Your text:</span> <span class="quote">“${esc(m.matched_text)}”</span></div>` : ""}
+        ${m.evidence ? `<div style="font-size:.88rem"><span class="count">On that page:</span> <span class="quote">“${esc(m.evidence)}”</span></div>` : ""}
+      </div>`).join("")}
+      ${d.verdict === "no_matches_found" ? `<p class="count" style="margin:10px 0 0">Not finding a copy doesn't prove originality — print books, paywalled sites and very recent pages often aren't searchable.</p>` : ""}
+      ${searches.length ? `<details ${d.matches.length ? "" : "open"}><summary>Every source the search found (${d.pages_checked}) — open any to read it yourself</summary>
+        ${searches.map(s => `<div style="margin-top:10px"><div class="count">Search: <strong>${esc(s.query)}</strong></div>
+          <ul class="src-list">${s.results.map(r => `<li><a href="${safeUrl(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>
+            <span class="domain">· ${esc(domainOf(r.url))}${r.page_age ? " · " + esc(prettyAge(r.page_age)) : ""}</span>${matched.has(r.url) ? `<span class="hit">MATCH</span>` : ""}</li>`).join("")}</ul></div>`).join("")}
+      </details>` : ""}
+    </div>`;
+  } catch (e) {
+    out.innerHTML = `<p class="err">${esc(e.message)}</p>`;
+  } finally { btn.disabled = false; }
+}
+$("deepBtn").addEventListener("click", runDeep);
+$("plagBtn").addEventListener("click", runPlag);
+const statusReady = checkStatus();
+
+// ---------- Chat assistant ----------
+let chatHistory = [], chatBusy = false, lastDeep = null, lastPlag = null;
+
+function renderMd(src) {
+  // Escape first, then add a small, safe subset of markdown: links (http/https only), bold, italics, code, lists.
+  let s = esc(src || "");
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, t, u) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (_, p, u) => `${p}<a href="${u}" target="_blank" rel="noopener">${domainOf(u.replace(/&amp;/g, "&")) || u}</a>`);
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>").replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/^#{1,4}\s*(.+)$/gm, "<strong>$1</strong>");
+  return s.split(/\n{2,}/).map(block => {
+    const lines = block.split("\n");
+    if (lines.every(l => /^\s*([-*•]|\d+\.)\s+/.test(l)))
+      return `<ul>${lines.map(l => `<li>${l.replace(/^\s*([-*•]|\d+\.)\s+/, "")}</li>`).join("")}</ul>`;
+    return `<p>${lines.join("<br>")}</p>`;
+  }).join("");
+}
+
+function addMsg(role, html) {
+  const el = document.createElement("div");
+  el.className = "msg " + role;
+  el.innerHTML = html;
+  $("chatLog").appendChild(el);
+  $("chatLog").scrollTop = $("chatLog").scrollHeight;
+  return el;
+}
+
+function chatSuggestions() {
+  let list;
+  if (!current) list = ["What are the signs a children's book was written by AI?", "Can AI detectors be wrong?", "How does Human Touch decide?"];
+  else {
+    list = ["Is this from a published book?", "Which paragraph looks most AI-written, and why?"];
+    list.push(lastPlag ? (lastPlag.matches.length ? "Which source is most likely the original?" : "Search children's book and publisher sites for this")
+                       : "Search Google Books for the opening line");
+    list.push("How could the author show they wrote this?");
+  }
+  $("chatSugg").innerHTML = list.map(q => `<button type="button">${esc(q)}</button>`).join("");
+  $("chatSugg").querySelectorAll("button").forEach(b => b.onclick = () => sendChat(b.textContent));
+}
+
+function openChat(prefill) {
+  $("chatPanel").classList.remove("hidden");
+  $("chatLaunch").classList.add("hidden");
+  if (!$("chatLog").children.length) {
+    addMsg("bot", renderMd(current
+      ? "Hi! I've got the text you're checking and its results. Ask me anything — or I can **run new searches** to track down where it came from."
+      : "Hi! Paste a text above and click **Check this text**, then ask me about the result. You can also ask general questions about AI and what children are reading."));
+  }
+  chatSuggestions();
+  if (prefill) { $("chatInput").value = prefill; }
+  $("chatInput").focus();
+}
+function closeChat() { $("chatPanel").classList.add("hidden"); $("chatLaunch").classList.remove("hidden"); }
+
+function chatContext() {
+  const ctx = { text: current ? current.text : "" };
+  if (lastDeep) ctx.analysis = {
+    verdict: lastDeep.verdict, leans: lastDeep.leans, probabilities: lastDeep.probabilities, confidence: lastDeep.confidence,
+    summary: lastDeep.summary, recognized_source: lastDeep.recognized_source,
+    evidence_for_human: lastDeep.evidence_for_human, evidence_for_ai: lastDeep.evidence_for_ai,
+    paragraphs: (lastDeep.paragraphs || []).map(p => ({ paragraph: p.paragraph, label: p.label, why: p.why })) };
+  else if (current) ctx.analysis = { quick_pattern_score: current.score };
+  if (lastPlag) ctx.search = { verdict: lastPlag.verdict, summary: lastPlag.summary,
+    matches: lastPlag.matches.map(m => ({ url: m.url, title: m.title, match_type: m.match_type, matched_text: m.matched_text })),
+    queries_already_run: (lastPlag.searches || []).map(s => s.query) };
+  return ctx;
+}
+
+async function sendChat(question) {
+  question = (question || "").trim();
+  if (!question || chatBusy) return;
+  if (!apiReady) { addMsg("bot", renderMd(NO_SERVER)); return; }
+  chatBusy = true; $("chatSend").disabled = true; $("chatInput").value = ""; autoGrow();
+  addMsg("user", esc(question).replace(/\n/g, "<br>"));
+  chatHistory.push({ role: "user", content: question });
+  const typing = addMsg("bot", `<span class="spinner"></span><span class="count">Thinking${/search|find|book|source|original|where/i.test(question) ? " and searching the web" : ""}…</span>`);
+  try {
+    const d = await callApi("/api/chat", { messages: chatHistory, context: chatContext() });
+    chatHistory.push({ role: "assistant", content: d.reply });
+    typing.innerHTML = renderMd(d.reply) +
+      (d.sources && d.sources.length ? `<div class="srcs">${d.sources.map(s => `<a href="${safeUrl(s.url)}" target="_blank" rel="noopener" title="${esc(s.title)}">${esc(domainOf(s.url) || s.title)} ↗</a>`).join("")}</div>` : "") +
+      (d.searches && d.searches.length ? `<div class="searched">Searched: ${d.searches.map(q => esc(q)).join(" · ")}</div>` : "");
+  } catch (e) {
+    chatHistory.pop();
+    typing.innerHTML = `<span class="err" style="margin:0">${esc(e.message)}</span>`;
+  } finally {
+    chatBusy = false; $("chatSend").disabled = false;
+    $("chatLog").scrollTop = $("chatLog").scrollHeight;
+    chatSuggestions();
+  }
+}
+function autoGrow() { const t = $("chatInput"); t.style.height = "44px"; t.style.height = Math.min(t.scrollHeight, 120) + "px"; }
+
+$("chatLaunch").addEventListener("click", () => openChat());
+$("navChat").addEventListener("click", () => openChat());
+$("chatClose").addEventListener("click", closeChat);
+$("askAboutResult").addEventListener("click", () => openChat());
+$("askRefine").addEventListener("click", () => openChat("Help me refine the search for where this text came from."));
+$("chatForm").addEventListener("submit", e => { e.preventDefault(); sendChat($("chatInput").value); });
+$("chatInput").addEventListener("input", autoGrow);
+$("chatInput").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat($("chatInput").value); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("chatPanel").classList.contains("hidden")) closeChat(); });
+
+// ---------- Wiring ----------
+const input = $("input");
+const updateCount = () => { $("count").textContent = words(input.value).length + " words"; };
+input.addEventListener("input", updateCount);
+$("analyze").addEventListener("click", () => {
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  render(analyze(text), text);
+  $("results").scrollIntoView({ behavior: "smooth" });
+  if (apiReady && words(text).length >= 30) runDeep();
+});
+$("clear").addEventListener("click", () => { input.value = ""; updateCount(); $("results").classList.add("hidden"); input.focus(); });
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+  document.querySelectorAll("[data-panel]").forEach(p => p.classList.toggle("hidden", p.dataset.panel !== t.dataset.tab));
+}));
+
+const SAMPLES = {
+  sampleHuman: `My grandmother kept her recipes in a biscuit tin that smelled faintly of cardamom and rust. I found it the week after the funeral, wedged behind the rice cooker she never once used. Most of the cards were in Tamil. A few were in English, and those were the ones that made me laugh, because she'd written things like "add salt until it tastes right, not like your uncle's cooking."
+
+I tried the lemon rice on a Tuesday. It was wrong. Too sour, the mustard seeds burnt, and I'd forgotten the curry leaves entirely — which, honestly, she would have noticed from across the room. My daughter ate it anyway. She's seven and she said it tasted "like the old house," which I don't think is true, but I didn't correct her.
+
+I've made it eleven times since. It's still not right. Maybe it never will be, and maybe that's fine. Some things you're supposed to keep chasing.`,
+  sampleAI: `In today's fast-paced digital landscape, artificial intelligence plays a pivotal role in shaping how we communicate, learn, and work. It is important to note that this transformative technology offers both remarkable opportunities and significant challenges. As we navigate the complexities of this ever-evolving field, it is crucial to strike a balance between innovation and responsibility.
+
+Furthermore, AI tools can streamline workflows, enhance productivity, and unlock new possibilities for creativity. By leveraging these cutting-edge solutions, organizations can foster a culture of continuous improvement. Moreover, individuals can harness the power of AI to elevate their skills and embark on a journey of lifelong learning.
+
+However, it is essential to approach this technology with a nuanced understanding of its limitations. Ethical considerations, data privacy, and transparency remain paramount concerns. Ultimately, the future of AI will depend on our collective commitment to using it thoughtfully. In conclusion, by embracing a holistic approach, we can ensure that AI serves as a beacon of progress for generations to come.`,
+  sampleKids: `Once upon a time, in a vibrant and enchanting forest, there lived a curious little fox named Finn. Finn loved to explore the bustling meadows, the sparkling streams, and the towering trees. Every day was a new adventure filled with wonder and joy.
+
+One sunny morning, Finn embarked on a journey to find the legendary Rainbow Flower. Along the way, he met a wise old owl, a cheerful rabbit, and a shy little turtle. Together, they faced many challenges, but they never gave up. Their unwavering friendship helped them overcome every obstacle.
+
+Finally, they discovered the Rainbow Flower glowing in a magical clearing. Finn realized that the true treasure was not the flower, but the friends he had made along the way. From that day on, Finn and his friends embraced the power of kindness and teamwork. And they all learned a valuable lesson: that together, anything is possible.`
+};
+Object.keys(SAMPLES).forEach(id => $(id).addEventListener("click", () => { input.value = SAMPLES[id]; updateCount(); $("analyze").click(); }));
+
+// Shareable example links, e.g. http://localhost:8765/?example=kids  (kids | article | essay)
+const EXAMPLE_LINKS = { kids: "sampleKids", article: "sampleAI", essay: "sampleHuman" };
+const exampleParam = new URLSearchParams(location.search).get("example");
+if (EXAMPLE_LINKS[exampleParam]) statusReady.then(() => $(EXAMPLE_LINKS[exampleParam]).click());
+</script>
+</body>
+</html>

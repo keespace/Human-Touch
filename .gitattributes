@@ -1,0 +1,5 @@
+# Keep line endings right for each platform's start script, whoever clones the repo.
+* text=auto
+*.sh  text eol=lf
+*.bat text eol=crlf
+*.png binary

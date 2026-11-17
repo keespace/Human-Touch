@@ -1,0 +1,14 @@
+# Secrets - your Anthropic API key lives here. Never commit or share it.
+.env
+.env.*
+!.env.example
+
+# Generated files
+Human_Touch_share.zip
+eval/results.json
+__pycache__/
+*.pyc
+
+# Local tool settings
+.claude/
+.vscode/
